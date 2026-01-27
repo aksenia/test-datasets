@@ -118,7 +118,7 @@ function prepare_bam {
 prepare_bam 1050 map-hifi data/HG002_haplotagged.bam testdata/HG002_PacBio_Revio.bam
 prepare_bam 690 map-hifi data/HG003_haplotagged.bam testdata/HG003_PacBio_Revio.bam
 prepare_bam 1150 map-hifi data/HG004_haplotagged.bam testdata/HG004_PacBio_Revio.bam
-prepare_bam 1300 lr:hq data/hg002.haplotagged.bam testdata/HG002_ONT.bam
+prepare_bam 1200 lr:hq data/hg002.haplotagged.bam testdata/HG002_ONT.bam
 prepare_bam 11 map-hifi data/HG002_haplotagged.bam data/HG002_PacBio_Revio_copy.bam
 prepare_bam 35 lr:hq data/hg002.haplotagged.bam testdata/HG002_ONT_copy.bam
 
