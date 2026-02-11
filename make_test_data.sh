@@ -28,8 +28,13 @@ chr16	176680	177522
 chr17	3053138	3073138
 EOF
 
-cat tmp/paraphase.bed tmp/test_data.bed tmp/chr16.bed tmp/chrX.bed > tmp/reference_regions.bed
-cat tmp/paraphase.bed tmp/test_data.bed tmp/chr16.bed tmp/chrX.bed > tmp/test_somalier_small.bed
+#chrM
+cat <<EOF > tmp/chrM.bed
+chrM	1	16569
+EOF
+
+cat tmp/paraphase.bed tmp/test_data.bed tmp/chr16.bed tmp/chrX.bed tmp/chrM.bed > tmp/reference_regions.bed
+cat tmp/paraphase.bed tmp/test_data.bed tmp/chr16.bed tmp/chrX.bed tmp/chrM.bed > tmp/test_somalier_small.bed
 # 4. Use the BED file to cut out regions in the BAM files
 
 # Merge the regions to create masking for reference
@@ -81,8 +86,6 @@ N
 >chr21
 N
 >chr22
-N
->chrM
 N
 >chrY
 N
