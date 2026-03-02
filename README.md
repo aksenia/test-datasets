@@ -21,4 +21,4 @@ This branch contains test data to be used for automated testing with the [genomi
   - `HG002_PacBio_Revio.bam`: BAM file containing Revio test data
   - `HG002_PacBio_Revio.fastq.gz`: Gzipped FASTQ file containing Revio test data
   - `snp_dbs.csv`: CSV file containing paths to SNV annotation database files 
-
+  - `paraphrase_rules.yaml`: Example paraphrase rules.
