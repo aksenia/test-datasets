@@ -11,8 +11,8 @@ wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRC
 gunzip -c data/GRCh38_no_alt_analysis_set.fasta.gz > data/GRCh38_no_alt_analysis_set.fasta
 
 # Download ONT HG002 haplotagged bam
-aws s3 cp s3://ont-open-data/giab_2023.05/analysis/variant_calling/hg002_sup_60x/hg002.haplotagged.bam data/hg002.haplotagged.bam --no-sign-request
-aws s3 cp s3://ont-open-data/giab_2023.05/analysis/variant_calling/hg002_sup_60x/hg002.haplotagged.bam.bai data/hg002.haplotagged.bam.bai --no-sign-request
+aws s3 cp --no-sign-request s3://ont-open-data/giab_2025.01/analysis/wf-human-variation/hac/HG002/PAW70337/output/SAMPLE.haplotagged.cram HG002_ONT.haplotagged.cram
+aws s3 cp --no-sign-request s3://ont-open-data/giab_2025.01/analysis/wf-human-variation/hac/HG002/PAW70337/output/SAMPLE.haplotagged.cram HG002_ONT.haplotagged.cram.crai
 
 # Add aligned PacBio HG002, HG003, HG004 manually, from Nallo run, as
 # data/HG002_aligned_haplotagged.bam (m84011_220902_175841_s1.hifi_reads.bam)

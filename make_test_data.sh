@@ -28,8 +28,13 @@ chr16	176680	177522
 chr17	3053138	3073138
 EOF
 
-cat tmp/paraphase.bed tmp/test_data.bed tmp/chr16.bed tmp/chrX.bed > tmp/reference_regions.bed
-cat tmp/paraphase.bed tmp/test_data.bed tmp/chr16.bed tmp/chrX.bed > tmp/test_somalier_small.bed
+#chrM
+cat <<EOF > tmp/chrM.bed
+chrM	1	16569
+EOF
+
+cat tmp/paraphase.bed tmp/test_data.bed tmp/chr16.bed tmp/chrX.bed tmp/chrM.bed > tmp/reference_regions.bed
+cat tmp/paraphase.bed tmp/test_data.bed tmp/chr16.bed tmp/chrX.bed tmp/chrM.bed > tmp/test_somalier_small.bed
 # 4. Use the BED file to cut out regions in the BAM files
 
 # Merge the regions to create masking for reference
@@ -82,8 +87,6 @@ N
 N
 >chr22
 N
->chrM
-N
 >chrY
 N
 EOF
@@ -117,10 +120,10 @@ function prepare_bam {
 
 prepare_bam 1050 map-hifi data/HG002_haplotagged.bam testdata/HG002_PacBio_Revio.bam
 prepare_bam 690 map-hifi data/HG003_haplotagged.bam testdata/HG003_PacBio_Revio.bam
-prepare_bam 1150 map-hifi data/HG004_haplotagged.bam testdata/HG004_PacBio_Revio.bam
-prepare_bam 1200 lr:hq data/hg002.haplotagged.bam testdata/HG002_ONT.bam
+prepare_bam 1250 map-hifi data/HG004_haplotagged.bam testdata/HG004_PacBio_Revio.bam
+prepare_bam 1200 lr:hq data/HG002_ONT.haplotagged.cram testdata/HG002_ONT.bam
 prepare_bam 11 map-hifi data/HG002_haplotagged.bam data/HG002_PacBio_Revio_copy.bam
-prepare_bam 35 lr:hq data/hg002.haplotagged.bam testdata/HG002_ONT_copy.bam
+prepare_bam 35 lr:hq data/HG002_ONT.haplotagged.cram testdata/HG002_ONT_copy.bam
 
 # Make fastq
 samtools sort -n testdata/HG002_PacBio_Revio.bam | samtools fastq -T \* -@ 36 | pigz -p 36 > testdata/HG002_PacBio_Revio.fastq.gz
