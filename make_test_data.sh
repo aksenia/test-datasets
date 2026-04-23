@@ -100,12 +100,21 @@ function prepare_bam {
   local in_bam=$3
   local out_bam=$4
   local rg_file="tmp/$(basename $out_bam .bam).rg.txt"
+  
+  # Add chrM deletion to test mitochondrial variant callers
+  # TODO: Instead, extract only chrM here so we can subsample mitochondria to specific depth,
+  # then extract only non chrM down below, and then join together
+  samtools view -M -L tmp/test_somalier_small.bed ${in_bam} -h -O BAM -u -x HP,PS,AS,CC,CG,CP,H1,H2,HI,H0,IH,MC,MD,MQ,NM,SA,TS > tmp/tmp.bam
+  samtools index tmp/tmp.bam
+  python3 generate_deletion.py --input tmp/tmp.bam --contig chrM --start 10000 --end 12000 \
+    | minimap2 -a -x ${minimap_preset} -t 36 tmp/hg38.test.fa.gz - | samtools sort -O BAM > tmp/with_chrm_deletion.bam
+  samtools index tmp/with_chrm_deletion.bam
 
   # Extract read group information to keep it after remapping
   samtools view -H ${in_bam} | grep "^@RG" > ${rg_file}
 
   # Subsample and remap. We must reheader to keep read group information
-  samtools view -M -L tmp/test_somalier_small.bed ${in_bam} -h -O BAM -u -x HP,PS,AS,CC,CG,CP,H1,H2,HI,H0,IH,MC,MD,MQ,NM,SA,TS \
+  samtools view -M -L tmp/test_somalier_small.bed tmp/with_chrm_deletion.bam -h -O BAM -u -x HP,PS,AS,CC,CG,CP,H1,H2,HI,H0,IH,MC,MD,MQ,NM,SA,TS \
     | samtools reset \
     | samtools sort -n -O SAM \
     | awk -v n="$subsample_to_n_reads" '/^@/ {print; next} ++c <= n {print} c==n {exit}' \
