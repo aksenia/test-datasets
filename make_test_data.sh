@@ -35,6 +35,8 @@ EOF
 
 cat tmp/paraphase.bed tmp/test_data.bed tmp/chr16.bed tmp/chrX.bed tmp/chrM.bed > tmp/reference_regions.bed
 cat tmp/paraphase.bed tmp/test_data.bed tmp/chr16.bed tmp/chrX.bed tmp/chrM.bed > tmp/test_somalier_small.bed
+cat tmp/paraphase.bed tmp/test_data.bed tmp/chr16.bed tmp/chrX.bed > tmp/test_somalier_small_without_chrM.bed
+
 # 4. Use the BED file to cut out regions in the BAM files
 
 # Merge the regions to create masking for reference
@@ -95,44 +97,59 @@ seqtk subseq data/GRCh38_no_alt_analysis_set.fasta tmp/chromosomes_with_sequence
 
 # Prepare small bam files by subsampling and remapping
 function prepare_bam {
-  local subsample_to_n_reads=$1
-  local minimap_preset=$2
-  local in_bam=$3
-  local out_bam=$4
+  local subsample_to_n_nuclear_reads=$1
+  local subsample_to_n_mitochondrial_reads=$2
+  local minimap_preset=$3
+  local in_bam=$4
+  local out_bam=$5
   local rg_file="tmp/$(basename $out_bam .bam).rg.txt"
-  
+
   # Add chrM deletion to test mitochondrial variant callers
-  # TODO: Instead, extract only chrM here so we can subsample mitochondria to specific depth,
-  # then extract only non chrM down below, and then join together
-  samtools view -M -L tmp/test_somalier_small.bed ${in_bam} -h -O BAM -u -x HP,PS,AS,CC,CG,CP,H1,H2,HI,H0,IH,MC,MD,MQ,NM,SA,TS > tmp/tmp.bam
-  samtools index tmp/tmp.bam
-  python3 generate_deletion.py --input tmp/tmp.bam --contig chrM --start 10000 --end 12000 \
-    | minimap2 -a -x ${minimap_preset} -t 36 tmp/hg38.test.fa.gz - | samtools sort -O BAM > tmp/with_chrm_deletion.bam
-  samtools index tmp/with_chrm_deletion.bam
+  samtools view -M -L tmp/chrM.bed ${in_bam} -h -O BAM -u -x HP,PS,AS,CC,CG,CP,H1,H2,HI,H0,IH,MC,MD,MQ,NM,SA,TS > tmp/tmp_chrM.bam
+  samtools index tmp/tmp_chrM.bam
+  python3 generate_deletion.py --input tmp/tmp_chrM.bam --contig chrM --start 10000 --end 12000 \
+    | minimap2 -a -x ${minimap_preset} -t 36 tmp/hg38.test.fa.gz - | samtools sort -O BAM > tmp/chrM_with_deletion.bam
+  samtools index tmp/chrM_with_deletion.bam
 
   # Extract read group information to keep it after remapping
   samtools view -H ${in_bam} | grep "^@RG" > ${rg_file}
 
-  # Subsample and remap. We must reheader to keep read group information
-  samtools view -M -L tmp/test_somalier_small.bed tmp/with_chrm_deletion.bam -h -O BAM -u -x HP,PS,AS,CC,CG,CP,H1,H2,HI,H0,IH,MC,MD,MQ,NM,SA,TS \
-    | samtools reset \
+  # Subsample and remap chrM. We must reheader to keep read group information
+  samtools reset tmp/chrM_with_deletion.bam \
     | samtools sort -n -O SAM \
-    | awk -v n="$subsample_to_n_reads" '/^@/ {print; next} ++c <= n {print} c==n {exit}' \
+    | awk -v n="$subsample_to_n_mitochondrial_reads" '/^@/ {print; next} ++c <= n {print} c==n {exit}' \
     | samtools fastq -T '*' \
     | minimap2 -a -x ${minimap_preset} -y --secondary=no -Y --MD -t 36 tmp/hg38.test.fa.gz - \
     | samtools view -@ 36 -h -O BAM -u - \
     | samtools reheader  -c "cat - ${rg_file}" - \
-    | samtools sort -o ${out_bam}
+    | samtools sort -o tmp/chrM_with_deletion_subsampled.bam
 
-    samtools index ${out_bam}
+    samtools index tmp/chrM_with_deletion_subsampled.bam
+
+  # Subsample and remap nuclear genome. We must reheader to keep read group information
+  samtools view -M -L tmp/test_somalier_small_without_chrM.bed ${in_bam} -h -O BAM -u -x HP,PS,AS,CC,CG,CP,H1,H2,HI,H0,IH,MC,MD,MQ,NM,SA,TS \
+    | samtools reset \
+    | samtools sort -n -O SAM \
+    | awk -v n="$subsample_to_n_nuclear_reads" '/^@/ {print; next} ++c <= n {print} c==n {exit}' \
+    | samtools fastq -T '*' \
+    | minimap2 -a -x ${minimap_preset} -y --secondary=no -Y --MD -t 36 tmp/hg38.test.fa.gz - \
+    | samtools view -@ 36 -h -O BAM -u - \
+    | samtools reheader  -c "cat - ${rg_file}" - \
+    | samtools sort -o tmp/nuclear_subsampled.bam
+
+  samtools index tmp/nuclear_subsampled.bam
+
+  # Merge chrM and nuclear reads together
+  samtools merge -f -O BAM ${out_bam} tmp/nuclear_subsampled.bam tmp/chrM_with_deletion_subsampled.bam
+  samtools index ${out_bam}
 }
 
-prepare_bam 1050 map-hifi data/HG002_haplotagged.bam testdata/HG002_PacBio_Revio.bam
-prepare_bam 690 map-hifi data/HG003_haplotagged.bam testdata/HG003_PacBio_Revio.bam
-prepare_bam 1250 map-hifi data/HG004_haplotagged.bam testdata/HG004_PacBio_Revio.bam
-prepare_bam 1200 lr:hq data/HG002_ONT.haplotagged.cram testdata/HG002_ONT.bam
-prepare_bam 11 map-hifi data/HG002_haplotagged.bam data/HG002_PacBio_Revio_copy.bam
-prepare_bam 35 lr:hq data/HG002_ONT.haplotagged.cram testdata/HG002_ONT_copy.bam
+prepare_bam 1050 50 map-hifi data/HG002_haplotagged.bam testdata/HG002_PacBio_Revio.bam
+prepare_bam 690 50 map-hifi data/HG003_haplotagged.bam testdata/HG003_PacBio_Revio.bam
+prepare_bam 1250 50 map-hifi data/HG004_haplotagged.bam testdata/HG004_PacBio_Revio.bam
+prepare_bam 1200 50 lr:hq data/HG002_ONT.haplotagged.cram testdata/HG002_ONT.bam
+prepare_bam 11 10 map-hifi data/HG002_haplotagged.bam data/HG002_PacBio_Revio_copy.bam
+prepare_bam 35 10 lr:hq data/HG002_ONT.haplotagged.cram testdata/HG002_ONT_copy.bam
 
 # Make fastq
 samtools sort -n testdata/HG002_PacBio_Revio.bam | samtools fastq -T \* -@ 36 | pigz -p 36 > testdata/HG002_PacBio_Revio.fastq.gz
