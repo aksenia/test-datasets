@@ -108,7 +108,8 @@ function prepare_bam {
   samtools view -M -L tmp/chrM.bed ${in_bam} -h -O BAM -u -x HP,PS,AS,CC,CG,CP,H1,H2,HI,H0,IH,MC,MD,MQ,NM,SA,TS > tmp/tmp_chrM.bam
   samtools index tmp/tmp_chrM.bam
   python3 generate_deletion.py --input tmp/tmp_chrM.bam --contig chrM --start 10000 --end 12000 \
-    | minimap2 -a -x ${minimap_preset} -t 36 tmp/hg38.test.fa.gz - | samtools sort -O BAM > tmp/chrM_with_deletion.bam
+    | minimap2 -a -x ${minimap_preset} -y --secondary=no -Y --MD -t 36 tmp/hg38.test.fa.gz - \
+    | samtools sort -O BAM > tmp/chrM_with_deletion.bam
   samtools index tmp/chrM_with_deletion.bam
 
   # Extract read group information to keep it after remapping
