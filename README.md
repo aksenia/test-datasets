@@ -2,7 +2,7 @@
 
 This branch contains test data to be used for automated testing with the [genomic-medicine-sweden/nallo](https://github.com/genomic-medicine-sweden/nallo) pipeline.
 
-All PRs require an approval from someone in the nallodev team before merging,
+All PRs require an approval from someone in the nallo-devs team before merging.
 
 ## Content of this repository
 
