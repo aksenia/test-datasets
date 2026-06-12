@@ -141,7 +141,7 @@ function prepare_bam {
   samtools index tmp/nuclear_subsampled.bam
 
   # Merge chrM and nuclear reads together
-  samtools merge -f -O BAM ${out_bam} tmp/nuclear_subsampled.bam tmp/chrM_with_deletion_subsampled.bam
+  samtools merge -c -f -O BAM ${out_bam} tmp/nuclear_subsampled.bam tmp/chrM_with_deletion_subsampled.bam
   samtools index ${out_bam}
 }
 
