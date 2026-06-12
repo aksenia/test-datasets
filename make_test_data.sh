@@ -149,7 +149,7 @@ prepare_bam 1050 100 map-hifi data/HG002_haplotagged.bam testdata/HG002_PacBio_R
 prepare_bam 690 10 map-hifi data/HG003_haplotagged.bam testdata/HG003_PacBio_Revio.bam
 prepare_bam 1250 10 map-hifi data/HG004_haplotagged.bam testdata/HG004_PacBio_Revio.bam
 prepare_bam 1200 10 lr:hq data/HG002_ONT.haplotagged.cram testdata/HG002_ONT.bam
-prepare_bam 11 10 map-hifi data/HG002_haplotagged.bam data/HG002_PacBio_Revio_copy.bam
+prepare_bam 11 10 map-hifi data/HG002_haplotagged.bam testdata/HG002_PacBio_Revio_copy.bam
 prepare_bam 35 10 lr:hq data/HG002_ONT.haplotagged.cram testdata/HG002_ONT_copy.bam
 
 # Make fastq
