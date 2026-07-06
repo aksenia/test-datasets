@@ -153,7 +153,7 @@ prepare_bam 11 10 map-hifi data/HG002_haplotagged.bam testdata/HG002_PacBio_Revi
 prepare_bam 35 10 lr:hq data/HG002_ONT.haplotagged.cram testdata/HG002_ONT_copy.bam
 
 # Make fastq
-samtools sort -n testdata/HG002_PacBio_Revio.bam | samtools fastq -T \* -@ 36 | pigz -p 36 > testdata/HG002_PacBio_Revio.fastq.gz
+samtools sort -n testdata/HG002_PacBio_Revio.bam | samtools fastq -T ML,MM -@ 36 | pigz -p 36 > testdata/HG002_PacBio_Revio.fastq.gz
 # chopper --threads 1 needed for stable output
 samtools sort -n testdata/HG002_ONT.bam | samtools fastq -T \* -@ 36 testdata/HG002_ONT.bam|chopper --maxlength 200000 --threads 1 | pigz -p 36 > testdata/HG002_ONT.fastq.gz
 
