@@ -1,2 +1,5 @@
 chrom	start	end	hgnc_symbol	hgnc_id	region_type
 chr20	2652400	2653100	GNAS	4392	nanoimprint
+chr7	50782178	50783005	GRB10	4564	nanoimprint
+chr7	130490866	130493279	MEST	7028	nanoimprint
+chr1	64419	65418	OR4F5	14825	promoter
