@@ -1,0 +1,6 @@
+OR1D5:
+  rules:
+    - when:
+        total_cn: { "==": 2 }
+      status: "pathological"
+      reason: "OR1D5 copy number is 2"
