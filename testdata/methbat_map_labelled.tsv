@@ -1,0 +1,4 @@
+chrom	start	end	hgnc_symbol	hgnc_id	region_type
+chr16	172876	173710	HBA2	4824	promoter
+chr16	172876	173710	HBM	4826	promoter
+chr20	2652400	2653100	GNAS	4392	nanoimprint

@@ -1,0 +1,7 @@
+chrom	start	end	cpg_label
+chr16	172876	173710	promoter_HBA2_HGNC:4824
+chr16	172876	173710	promoter_HBM_HGNC:4826
+chr16	172876	173710	cpg_island_HBA_locus
+chr20	2652400	2653100	nanoimprint_GNAS_HGNC:4392
+chr20	2652400	2653100	promoter_NPEPL1_HGNC:16244
+chr20	2652400	2653100	nanoimprint_GNAS_XL_HGNC:NA
